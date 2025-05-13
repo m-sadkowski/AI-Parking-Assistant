@@ -5,10 +5,6 @@ using Unity.MLAgents.Sensors;
 
 public class MoveToGoalAgent : Agent
 {
-    const float defaultX = -2f;
-    const float defaultY = 0f;
-    const float defaultZ = -1f;
-
     [SerializeField] private Transform targetTransform;
     [SerializeField] private Material winMaterial;
     [SerializeField] private Material loseMaterial;
@@ -28,9 +24,10 @@ public class MoveToGoalAgent : Agent
 
     public override void OnEpisodeBegin()
     {
-        transform.localPosition = new Vector3(defaultX, defaultY, defaultZ);
+        transform.localPosition = new Vector3(Random.Range(-3.5f, 0f), 0f, Random.Range(-1.5f, 1.5f));
         transform.localRotation = Quaternion.Euler(0f, 90f, 0f);
-        currentSteerAngle = 0f;
+        currentSteerAngle = Random.Range(-1.5f, 1.5f);
+        targetTransform.localPosition = new Vector3(Random.Range(2f, 4f), 0f, Random.Range(-1.5f, 1.5f));
     }
 
     public override void CollectObservations(VectorSensor sensor)
