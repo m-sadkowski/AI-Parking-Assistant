@@ -1,0 +1,10 @@
+1. Install Python 3.9(.13)
+2. cd AI-Parking-Assistant(\UnityProject)?
+2. python3.9 -m venv venv
+3. venv\Scripts\activate
+4. python -m pip install --upgrade pip
+5. pip3 install mlagents
+6. pip3 install torch torchvision torchaudio
+7. pip install protobuf==3.20.2
+8. pip install onxx==1.11.0
+9. mlagents-learn
