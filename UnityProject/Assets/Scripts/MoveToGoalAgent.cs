@@ -7,13 +7,15 @@ using System;
 public class MoveToGoalAgent : Agent
 {
 
-    const float defaultY = 0.5f;
+    const float defaultX = -2f;
+    const float defaultY = 0f;
+    const float defaultZ = -1f;
 
     [SerializeField] private Transform targetTransform;
 
     public override void OnEpisodeBegin() 
     {
-        transform.position = new Vector3(0, defaultY, 0);
+        transform.position = new Vector3(defaultX, defaultY, defaultZ);
     }
 
     public override void CollectObservations(VectorSensor sensor) 
@@ -40,7 +42,6 @@ public class MoveToGoalAgent : Agent
 
     private void OnTriggerEnter(Collider other) 
     {
-        Debug.Log("kolizja");
         if (other.TryGetComponent<Ball>(out Ball ball))
         {
             SetReward(1f);

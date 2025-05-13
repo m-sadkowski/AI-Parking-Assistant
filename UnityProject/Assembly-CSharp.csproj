@@ -67,6 +67,9 @@
     <Compile Include="Assets\Scripts\MoveToGoalAgent.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\Polyeler\Simple Retro Car\README.txt" />
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="UnityEngine">
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.1.2f1\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>
       <Private>False</Private>
