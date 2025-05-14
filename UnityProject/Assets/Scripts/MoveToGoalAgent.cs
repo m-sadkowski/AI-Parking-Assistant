@@ -10,6 +10,10 @@ public class MoveToGoalAgent : Agent
     [SerializeField] private Material loseMaterial;
     [SerializeField] private MeshRenderer floorMeshRenderer;
 
+    [SerializeField] private Transform frontLeftWheelTransform;
+    [SerializeField] private Transform frontRightWheelTransform;
+
+
     [Header("Car Settings")]
     [Tooltip("Prędkość jazdy (m/s)")]
     [SerializeField] private float driveSpeed = 3f;
@@ -62,6 +66,16 @@ public class MoveToGoalAgent : Agent
 
         // 3) Obrót karoserii:
         transform.Rotate(0f, turnDegrees, 0f);
+
+        // 3b) Skręt kół
+        Vector3 leftEuler = frontLeftWheelTransform.localEulerAngles;
+        Vector3 rightEuler = frontRightWheelTransform.localEulerAngles;
+
+        leftEuler.y = currentSteerAngle;
+        rightEuler.y = currentSteerAngle;
+
+        frontLeftWheelTransform.localEulerAngles = leftEuler;
+        frontRightWheelTransform.localEulerAngles = rightEuler;
 
         // 4) Ruch do przodu/tyłu:
         Vector3 move = transform.forward * throttleInput * driveSpeed * Time.deltaTime;

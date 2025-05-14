@@ -1,0 +1,42 @@
+{
+    "name": "root",
+    "metadata": {
+        "timer_format_version": "0.1.0",
+        "start_time_seconds": "1747169605",
+        "python_version": "3.9.13 (tags/v3.9.13:6de2ca5, May 17 2022, 16:36:42) [MSC v.1929 64 bit (AMD64)]",
+        "command_line_arguments": "C:\\AI-Parking-Assistant\\venv\\Scripts\\mlagents-learn --run-id=Testnowy3",
+        "mlagents_version": "0.30.0",
+        "mlagents_envs_version": "0.30.0",
+        "communication_protocol_version": "1.5.0",
+        "pytorch_version": "2.7.0+cpu",
+        "numpy_version": "1.21.2",
+        "end_time_seconds": "1747169668"
+    },
+    "total": 62.5033862,
+    "count": 1,
+    "self": 0.0033908000000124616,
+    "children": {
+        "run_training.setup": {
+            "total": 0.04656219999999989,
+            "count": 1,
+            "self": 0.04656219999999989
+        },
+        "TrainerController.start_learning": {
+            "total": 62.45343319999999,
+            "count": 1,
+            "self": 0.00016109999999258662,
+            "children": {
+                "TrainerController._reset_env": {
+                    "total": 62.4532537,
+                    "count": 1,
+                    "self": 62.4532537
+                },
+                "TrainerController._save_models": {
+                    "total": 1.8400000001861372e-05,
+                    "count": 1,
+                    "self": 1.8400000001861372e-05
+                }
+            }
+        }
+    }
+}
