@@ -33,7 +33,7 @@ public class MoveToGoalAgent : Agent
         transform.localRotation = Quaternion.Euler(0f, 90f, 0f);
         currentSteerAngle = Random.Range(-1.5f, 1.5f);
         // targetTransform.localPosition = new Vector3(Random.Range(2f, 4f), 0.5f, Random.Range(-1.5f, 1.5f));
-        targetTransform.localPosition = new Vector3(8.25f, 0.04f, 6.75f);
+        targetTransform.localPosition = new Vector3(-3.25f + 3.75f * Random.Range(0, 6), 0.04f, 6.75f);
     }
 
     public override void CollectObservations(VectorSensor sensor)
