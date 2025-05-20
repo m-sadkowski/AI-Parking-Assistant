@@ -8011,7 +8011,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 3131eb239467945468ca6245f35c2ba1, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 2
+      value: -1.38
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 3131eb239467945468ca6245f35c2ba1, type: 3}
       propertyPath: m_LocalPosition.y
@@ -8019,7 +8019,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 3131eb239467945468ca6245f35c2ba1, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 0.16
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 3131eb239467945468ca6245f35c2ba1, type: 3}
       propertyPath: m_LocalRotation.w
@@ -8178,7 +8178,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BrainParameters:
-    VectorObservationSize: 34
+    VectorObservationSize: 23
     NumStackedVectorObservations: 1
     m_ActionSpec:
       m_NumContinuousActions: 2
@@ -8211,11 +8211,8 @@ MonoBehaviour:
   agentParameters:
     maxStep: 0
   hasUpgradedFromAgentParameters: 1
-  MaxStep: 2000
+  MaxStep: 5000
   parkingSpot: {fileID: 1310928141820722568}
-  winMaterial: {fileID: 2100000, guid: 7aa8f3382c1f11e4c8008543f8a81fea, type: 2}
-  loseMaterial: {fileID: 2100000, guid: 42f7cabdcf61bdc4383e8ec088a38f13, type: 2}
-  floorMeshRenderer: {fileID: 8376633268547381162}
   frontLeftWheelTransform: {fileID: 5157765491659884328}
   frontRightWheelTransform: {fileID: 4392431631124776588}
   parkedCar1: {fileID: 454141939798920985}

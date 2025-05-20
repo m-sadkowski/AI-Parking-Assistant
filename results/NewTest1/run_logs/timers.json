@@ -1,0 +1,47 @@
+{
+    "name": "root",
+    "metadata": {
+        "timer_format_version": "0.1.0",
+        "start_time_seconds": "1747688495",
+        "python_version": "3.9.13 (tags/v3.9.13:6de2ca5, May 17 2022, 16:36:42) [MSC v.1929 64 bit (AMD64)]",
+        "command_line_arguments": "C:\\Users\\Michal\\Documents\\GitHub\\AI-Parking-Assistant\\venv\\Scripts\\mlagents-learn config/moveToGoal.yaml --run-id=NewTest1",
+        "mlagents_version": "0.30.0",
+        "mlagents_envs_version": "0.30.0",
+        "communication_protocol_version": "1.5.0",
+        "pytorch_version": "2.7.0+cpu",
+        "numpy_version": "1.21.2",
+        "end_time_seconds": "1747688581"
+    },
+    "total": 85.65313400000001,
+    "count": 1,
+    "self": 0.005654399999997395,
+    "children": {
+        "run_training.setup": {
+            "total": 0.2126058000000004,
+            "count": 1,
+            "self": 0.2126058000000004
+        },
+        "TrainerController.start_learning": {
+            "total": 85.4348738,
+            "count": 1,
+            "self": 0.0004135000000076161,
+            "children": {
+                "TrainerController._reset_env": {
+                    "total": 85.4344494,
+                    "count": 1,
+                    "self": 85.4344494
+                },
+                "trainer_threads": {
+                    "total": 1.4000000021496817e-06,
+                    "count": 1,
+                    "self": 1.4000000021496817e-06
+                },
+                "TrainerController._save_models": {
+                    "total": 9.49999999022566e-06,
+                    "count": 1,
+                    "self": 9.49999999022566e-06
+                }
+            }
+        }
+    }
+}

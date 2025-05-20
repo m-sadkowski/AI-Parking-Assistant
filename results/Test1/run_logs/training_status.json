@@ -2,22 +2,22 @@
     "AgentControl": {
         "checkpoints": [
             {
-                "steps": 2289,
-                "file_path": "results\\Test1\\AgentControl\\AgentControl-2289.onnx",
-                "reward": 3.697077214717865,
-                "creation_time": 1747684419.4154832,
+                "steps": 453867,
+                "file_path": "results\\Test1\\AgentControl\\AgentControl-453867.onnx",
+                "reward": null,
+                "creation_time": 1747689634.3916976,
                 "auxillary_file_paths": [
-                    "results\\Test1\\AgentControl\\AgentControl-2289.pt"
+                    "results\\Test1\\AgentControl\\AgentControl-453867.pt"
                 ]
             }
         ],
         "final_checkpoint": {
-            "steps": 2289,
+            "steps": 453867,
             "file_path": "results\\Test1\\AgentControl.onnx",
-            "reward": 3.697077214717865,
-            "creation_time": 1747684419.4154832,
+            "reward": null,
+            "creation_time": 1747689634.3916976,
             "auxillary_file_paths": [
-                "results\\Test1\\AgentControl\\AgentControl-2289.pt"
+                "results\\Test1\\AgentControl\\AgentControl-453867.pt"
             ]
         }
     },
