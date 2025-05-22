@@ -1,8 +1,8 @@
-﻿﻿using UnityEngine;
+﻿using System.Collections.Generic;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
-using System.Collections.Generic;
+using UnityEngine;
 
 public class MoveToGoalAgent : Agent
 {
@@ -23,22 +23,17 @@ public class MoveToGoalAgent : Agent
     private List<Vector3> possibleParkingSpots;
 
     [Header("Car Settings")]
-    [Tooltip("Prędkość jazdy (m/s)")]
     [SerializeField] private float driveSpeed = 5f;
-    [Tooltip("Maksymalny kąt skrętu kół (stopnie)")]
     [SerializeField] private float maxSteerAngle = 30f;
-    [Tooltip("Szybkość zmiany kąta kół (stopnie/sekundę)")]
     [SerializeField] private float steerSpeed = 180f;
-    [Tooltip("Rozstaw osi pojazdu (m)")]
     [SerializeField] private float wheelBase = 1.5f;
 
-    private float currentSteerAngle = 0f;
-    private float currentSpeed = 0f;
-    private float lastDistanceToGoal = Mathf.Infinity;
-    private float turnDegrees = 0f;
+    private Rigidbody rb;
+    private float previousDistanceToTarget;
+    private Vector3 currentVelocity = Vector3.zero;
 
-    private Queue<(float steer, float throttle)> lastActions = new Queue<(float, float)>();
-    private int repeatActionThreshold = 20; // Zwiększony próg
+    // 🔄 Dodane: informacja o byciu na linii
+    private bool isOnLine = false;
 
     public override void OnEpisodeBegin()
     {
@@ -57,7 +52,6 @@ public class MoveToGoalAgent : Agent
             int idx = Random.Range(0, availableSpots.Count);
             car.localPosition = availableSpots[idx];
             availableSpots.RemoveAt(idx);
-
             float randomYRotation = Random.Range(-10f, 10f);
             car.localRotation = Quaternion.Euler(0f, randomYRotation, 0f);
         }
@@ -68,145 +62,92 @@ public class MoveToGoalAgent : Agent
         parkingSpot.localPosition = new Vector3(parkingSpot.localPosition.x + 3.25f, parkingSpot.localPosition.y, 8f * signZ);
         parkingSpot.localRotation = Quaternion.Euler(0f, signZ > 0 ? 180f : 0f, 0f);
 
-        transform.localPosition = new Vector3(Random.Range(-1, 13), 0f, Random.Range(-1, 1));
+        transform.localPosition = new Vector3(2.75f, 0f, 0f);
         transform.localRotation = Quaternion.Euler(0f, 90f, 0f);
 
-        currentSteerAngle = 0f;
-        currentSpeed = 0f;
-        lastDistanceToGoal = Vector3.Distance(transform.localPosition, parkingSpot.localPosition);
+        rb = GetComponent<Rigidbody>();
+        previousDistanceToTarget = Vector3.Distance(transform.localPosition, parkingSpot.localPosition);
 
-        lastActions.Clear();
+        isOnLine = false; // reset
     }
 
     public override void CollectObservations(VectorSensor sensor)
     {
-        float sensorLength = 10f;
-        for (int i = 0; i < 16; i++)
-        {
-            float angle = i * 22.5f;
-            Vector3 dir = Quaternion.Euler(0f, angle, 0f) * transform.forward;
-            if (Physics.Raycast(transform.position, dir, out RaycastHit hit, sensorLength))
-            {
-                sensor.AddObservation(hit.distance / sensorLength);
-            }
-            else
-            {
-                sensor.AddObservation(1f);
-            }
-        }
+        Vector3 toTarget = parkingSpot.localPosition - transform.localPosition;
 
-        sensor.AddObservation(currentSpeed / driveSpeed);
-        sensor.AddObservation(turnDegrees / 10f);
-
-        Vector3 relativePos = transform.InverseTransformPoint(parkingSpot.localPosition);
-        sensor.AddObservation(relativePos.x / 20f);
-        sensor.AddObservation(relativePos.z / 20f);
-
-        float distanceToGoal = Vector3.Distance(transform.localPosition, parkingSpot.localPosition);
-        sensor.AddObservation(distanceToGoal / 20f);
-
-        float angleToGoal = Mathf.DeltaAngle(transform.eulerAngles.y, parkingSpot.eulerAngles.y) / 180f;
-        sensor.AddObservation(angleToGoal);
-
-        sensor.AddObservation(currentSpeed < -0.1f ? 1f : 0f);
+        sensor.AddObservation(transform.localPosition);
+        sensor.AddObservation(transform.forward);
+        sensor.AddObservation(parkingSpot.localPosition);
+        sensor.AddObservation(parkingSpot.forward);
+        sensor.AddObservation(toTarget.normalized);
+        sensor.AddObservation(toTarget.magnitude);
+        sensor.AddObservation(currentVelocity.magnitude); // symulowana prędkość
     }
 
     public override void OnActionReceived(ActionBuffers actions)
     {
         float steerInput = Mathf.Clamp(actions.ContinuousActions[0], -1f, 1f);
-        float throttleInput = Mathf.Clamp(actions.ContinuousActions[1], -1f, 1f);
+        float driveInput = Mathf.Clamp(actions.ContinuousActions[1], -1f, 1f);
 
-        float distanceToGoal = Vector3.Distance(transform.localPosition, parkingSpot.localPosition);
-        float adaptiveSpeed = driveSpeed * Mathf.Clamp(distanceToGoal / 5f, 0.1f, 1f);
+        float steerAngle = steerInput * maxSteerAngle * Mathf.Deg2Rad;
+        float velocity = driveInput * driveSpeed;
+        currentVelocity = transform.forward * velocity;
 
-        float targetSteerAngle = steerInput * maxSteerAngle;
-        currentSteerAngle = Mathf.Lerp(currentSteerAngle, targetSteerAngle, 0.1f);
-
-        float steerAngleRad = currentSteerAngle * Mathf.Deg2Rad;
-        float turnRadius = Mathf.Abs(Mathf.Tan(steerAngleRad)) > 0.001f ? wheelBase / Mathf.Tan(steerAngleRad) : Mathf.Infinity;
-        float angularVelocity = (throttleInput * adaptiveSpeed) / turnRadius;
-        turnDegrees = angularVelocity * Mathf.Rad2Deg * Time.deltaTime;
-
-        transform.Rotate(0f, turnDegrees, 0f);
-
-        Vector3 leftEuler = frontLeftWheelTransform.localEulerAngles;
-        Vector3 rightEuler = frontRightWheelTransform.localEulerAngles;
-        leftEuler.y = currentSteerAngle;
-        rightEuler.y = currentSteerAngle;
-        frontLeftWheelTransform.localEulerAngles = leftEuler;
-        frontRightWheelTransform.localEulerAngles = rightEuler;
-
-        Vector3 move = transform.forward * throttleInput * adaptiveSpeed * Time.deltaTime;
-        transform.localPosition += move;
-
-        currentSpeed = throttleInput * adaptiveSpeed;
-
-        if (lastActions.Count >= repeatActionThreshold)
+        float angularVelocity = 0f;
+        if (Mathf.Abs(steerAngle) > 0.01f)
         {
-            lastActions.Dequeue();
+            float turnRadius = wheelBase / Mathf.Tan(steerAngle);
+            angularVelocity = velocity / turnRadius;
         }
-        lastActions.Enqueue((steerInput, throttleInput));
 
-        CalculateReward(steerInput, throttleInput, distanceToGoal);
+        transform.position += currentVelocity * Time.deltaTime;
+        transform.Rotate(0f, angularVelocity * Mathf.Rad2Deg * Time.deltaTime, 0f, Space.World);
+
+        frontLeftWheelTransform.localRotation = Quaternion.Euler(0f, steerInput * maxSteerAngle, 0f);
+        frontRightWheelTransform.localRotation = Quaternion.Euler(0f, steerInput * maxSteerAngle, 0f);
+
+        CalculateReward();
     }
 
-    private void CalculateReward(float steerInput, float throttleInput, float distanceToGoal)
+    private void CalculateReward()
     {
-        float angleToGoal = Mathf.DeltaAngle(transform.eulerAngles.y, parkingSpot.eulerAngles.y);
-        float angleDiff = Mathf.Abs(angleToGoal);
+        float distanceToTarget = Vector3.Distance(transform.localPosition, parkingSpot.localPosition);
+        float angle = Vector3.Angle(transform.forward, parkingSpot.forward);
+        float distanceDelta = previousDistanceToTarget - distanceToTarget;
 
-        // Nowa logika kar za kąt
-        if (angleDiff > 10f && angleDiff < 170f)
+        bool isClose = distanceToTarget < 2.5f;
+        bool badAngle = angle > 30f;
+
+        if (isOnLine && distanceDelta < 0f)
         {
-            AddReward(-angleDiff / 180f * 0.1f);
+            // Cofanie się na linii — nie karz
+        }
+        else if (distanceDelta > 0f)
+        {
+            AddReward(distanceDelta * 0.5f); // zbliża się — nagroda
+        }
+        else if (!isClose || !badAngle)
+        {
+            AddReward(distanceDelta * 0.2f); // oddala się daleko lub ma dobry kąt — kara
         }
 
-        AddReward((lastDistanceToGoal - distanceToGoal) * 1f);
-
-        AddReward(-Mathf.Abs(currentSpeed) * 0.002f); // Zmniejszona kara
-
-        // Nagroda za jazdę tyłem z uwzględnieniem kąta
-        if (currentSpeed < -0.1f && (lastDistanceToGoal - distanceToGoal) > 0f)
+        if (distanceToTarget < 2f)
         {
-            float reverseAngleDiff = Mathf.Abs(Mathf.DeltaAngle(transform.eulerAngles.y, parkingSpot.eulerAngles.y + 180f));
-            AddReward(0.5f * (1f - reverseAngleDiff / 180f));
+            AddReward(-angle / 180f * 0.3f); // kara za zły kąt
         }
 
-        // Kara za powtarzalność (zmodyfikowana)
-        bool allSame = true;
-        (float steer, float throttle) firstAction = lastActions.Peek();
-        foreach (var a in lastActions)
+        if (isOnLine)
         {
-            if (Mathf.Abs(a.steer - firstAction.steer) > 0.05f || Mathf.Abs(a.throttle - firstAction.throttle) > 0.05f)
-            {
-                allSame = false;
-                break;
-            }
-        }
-        if (allSame && lastActions.Count >= repeatActionThreshold)
-        {
-            AddReward(-0.1f); // Mniejsza kara
+            AddReward(-0.05f); // ciągła kara za bycie na linii
         }
 
-        if (Mathf.Abs(currentSpeed) < 0.05f && distanceToGoal > 2f)
+        if (distanceToTarget < 1.0f && angle < 15f)
         {
-            AddReward(-0.05f); // Zmniejszona kara
+            SetReward(1.0f);
+            EndEpisode();
         }
 
-        lastDistanceToGoal = distanceToGoal;
-
-        if (distanceToGoal < 1.0f) // Zwiększona tolerancja
-        {
-            if (angleDiff < 20f && Mathf.Abs(currentSpeed) < 0.5f) // Luźniejsze warunki
-            {
-                SetReward(3f);
-                EndEpisode();
-            }
-            else
-            {
-                AddReward(-0.1f);
-            }
-        }
+        previousDistanceToTarget = distanceToTarget;
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
@@ -218,33 +159,29 @@ public class MoveToGoalAgent : Agent
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.TryGetComponent<Target>(out Target target))
-        {
-            SetReward(2f);
-            EndEpisode();
-        }
-        else if (other.TryGetComponent<Pavement>(out Pavement pavement) || other.TryGetComponent<ParkedCar>(out ParkedCar parkedCar))
-        {
-            SetReward(-3f);
-            EndEpisode();
-        }
-        else if (other.TryGetComponent<Line>(out Line line))
+        if (other.TryGetComponent<ParkedCar>(out _))
         {
             AddReward(-1f);
+            EndEpisode();
+        }
+        else if (other.TryGetComponent<Pavement>(out _))
+        {
+            AddReward(-1f);
+            EndEpisode();
+        }
+        else if (other.TryGetComponent<Line>(out _))
+        {
+            isOnLine = true;
+            AddReward(-0.3f);
         }
     }
 
-    private void OnDrawGizmos()
+    private void OnTriggerExit(Collider other)
     {
-        Gizmos.color = Color.red;
-        Gizmos.DrawSphere(parkingSpot.position, 0.5f);
-
-        Gizmos.color = Color.cyan;
-        for (int i = 0; i < 16; i++)
+        if (other.TryGetComponent<Line>(out _))
         {
-            float angle = i * 22.5f;
-            Vector3 dir = Quaternion.Euler(0f, angle, 0f) * transform.forward;
-            Gizmos.DrawRay(transform.position, dir * 10f);
+            isOnLine = false;
+            AddReward(0.3f); // bonus za zejście z linii
         }
     }
 }

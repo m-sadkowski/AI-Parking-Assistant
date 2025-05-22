@@ -3,19 +3,19 @@ behaviors:
   AgentControl:
     trainer_type: ppo
     hyperparameters:
-      batch_size: 64
+      batch_size: 512
       buffer_size: 2048
       learning_rate: 0.0001
-      beta: 0.001
-      epsilon: 0.1
-      lambd: 0.99
+      beta: 0.03
+      epsilon: 0.2
+      lambd: 0.95
       num_epoch: 5
       shared_critic: false
       learning_rate_schedule: linear
-      beta_schedule: constant
+      beta_schedule: linear
       epsilon_schedule: linear
     network_settings:
-      normalize: false
+      normalize: true
       hidden_units: 256
       num_layers: 3
       vis_encode_type: simple
@@ -37,8 +37,8 @@ behaviors:
     init_path: null
     keep_checkpoints: 5
     checkpoint_interval: 500000
-    max_steps: 500000
-    time_horizon: 64
+    max_steps: 10000000
+    time_horizon: 128
     summary_freq: 10000
     threaded: false
     self_play: null
@@ -63,7 +63,7 @@ engine_settings:
   no_graphics: false
 environment_parameters: null
 checkpoint_settings:
-  run_id: Test3
+  run_id: TEST3
   initialize_from: null
   load_model: false
   resume: false

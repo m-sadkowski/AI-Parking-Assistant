@@ -2,22 +2,58 @@
     "AgentControl": {
         "checkpoints": [
             {
-                "steps": 10685,
-                "file_path": "results\\Test3\\AgentControl\\AgentControl-10685.onnx",
-                "reward": null,
-                "creation_time": 1747691476.8345082,
+                "steps": 499927,
+                "file_path": "results\\TEST3\\AgentControl\\AgentControl-499927.onnx",
+                "reward": 31.16703538099925,
+                "creation_time": 1747912015.8819373,
                 "auxillary_file_paths": [
-                    "results\\Test3\\AgentControl\\AgentControl-10685.pt"
+                    "results\\TEST3\\AgentControl\\AgentControl-499927.pt"
+                ]
+            },
+            {
+                "steps": 999948,
+                "file_path": "results\\TEST3\\AgentControl\\AgentControl-999948.onnx",
+                "reward": 23.151154041290283,
+                "creation_time": 1747912696.6006317,
+                "auxillary_file_paths": [
+                    "results\\TEST3\\AgentControl\\AgentControl-999948.pt"
+                ]
+            },
+            {
+                "steps": 1499997,
+                "file_path": "results\\TEST3\\AgentControl\\AgentControl-1499997.onnx",
+                "reward": 60.67854976654053,
+                "creation_time": 1747913372.4601765,
+                "auxillary_file_paths": [
+                    "results\\TEST3\\AgentControl\\AgentControl-1499997.pt"
+                ]
+            },
+            {
+                "steps": 1999980,
+                "file_path": "results\\TEST3\\AgentControl\\AgentControl-1999980.onnx",
+                "reward": 60.99757385253906,
+                "creation_time": 1747914050.437256,
+                "auxillary_file_paths": [
+                    "results\\TEST3\\AgentControl\\AgentControl-1999980.pt"
+                ]
+            },
+            {
+                "steps": 2490372,
+                "file_path": "results\\TEST3\\AgentControl\\AgentControl-2490372.onnx",
+                "reward": null,
+                "creation_time": 1747914919.6425824,
+                "auxillary_file_paths": [
+                    "results\\TEST3\\AgentControl\\AgentControl-2490372.pt"
                 ]
             }
         ],
         "final_checkpoint": {
-            "steps": 10685,
-            "file_path": "results\\Test3\\AgentControl.onnx",
+            "steps": 2490372,
+            "file_path": "results\\TEST3\\AgentControl.onnx",
             "reward": null,
-            "creation_time": 1747691476.8345082,
+            "creation_time": 1747914919.6425824,
             "auxillary_file_paths": [
-                "results\\Test3\\AgentControl\\AgentControl-10685.pt"
+                "results\\TEST3\\AgentControl\\AgentControl-2490372.pt"
             ]
         }
     },
