@@ -1,7 +1,7 @@
 behaviors:
   AgentControl:
     trainer_type: ppo
-    hyperparameters:
+    hyperparameters: 
       batch_size: 512
       buffer_size: 2048
       learning_rate: 0.0001

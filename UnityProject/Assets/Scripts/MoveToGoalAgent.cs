@@ -34,16 +34,16 @@ public class MoveToGoalAgent : Agent
 
     // 🔄 Dodane: informacja o byciu na linii
     private bool isOnLine = false;
-
+    private bool parking_try;
     public override void OnEpisodeBegin()
     {
         parkedCars = new List<Transform> { parkedCar1, parkedCar2, parkedCar3, parkedCar4, parkedCar5, parkedCar6, parkedCar7, parkedCar8 };
-
+        parking_try = false;
         possibleParkingSpots = new List<Vector3>();
         for (int i = 0; i < 6; i++)
         {
-            possibleParkingSpots.Add(new Vector3(-3.25f + 3.75f * i, 0.04f, 2.3f));
-            possibleParkingSpots.Add(new Vector3(-3.25f + 3.75f * i, 0.04f, -11.2f));
+            possibleParkingSpots.Add(new Vector3(-7f + 3.75f * i, 0.04f, 2.3f));
+            possibleParkingSpots.Add(new Vector3(-7f + 3.75f * i, 0.04f, -11.2f));
         }
 
         List<Vector3> availableSpots = new List<Vector3>(possibleParkingSpots);
@@ -122,20 +122,24 @@ public class MoveToGoalAgent : Agent
         if (distanceDelta > 0f)
             AddReward(distanceDelta * 0.5f); // postęp
         else
-            AddReward(distanceDelta * 0.2f); // cofanie = kara
+            AddReward(distanceDelta * 0.5f); // cofanie = kara
 
-        if (distanceToTarget < 2f && angle < 30f)
+        if (distanceToTarget < 2f && angle < 30f && parking_try == false)
+        {
             AddReward(0.2f); // zachęta za próbę zaparkowania
+            parking_try = true;
+        }
+            
 
         if (distanceToTarget < 0.3f)
             AddReward(-angle / 180f * 0.3f); // kara za zły kąt blisko celu
 
-        //if (isOnLine)
-           // AddReward(-0.01f); // łagodna kara za linię
+
 
         if (distanceToTarget < 1.0f && angle < 15f)
         {
-            SetReward(3.0f); // duża nagroda za sukces
+            SetReward(15.0f); // duża nagroda za sukces
+            if (isOnLine) AddReward(-5f);
             EndEpisode();
         }
 
@@ -156,13 +160,13 @@ public class MoveToGoalAgent : Agent
     {
         if (other.TryGetComponent<ParkedCar>(out _))
         {
-            //AddReward(-1f);
-           // EndEpisode();
+            AddReward(-1f);
+            EndEpisode();
         }
         else if (other.TryGetComponent<Pavement>(out _))
         {
-            //AddReward(-1f);
-           // EndEpisode();
+            AddReward(-1f);
+            EndEpisode();
         }
         else if (other.TryGetComponent<Line>(out _))
         {
