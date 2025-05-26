@@ -59,7 +59,7 @@ public class MoveToGoalAgent : Agent
         int targetIdx = Random.Range(0, availableSpots.Count);
         parkingSpot.localPosition = availableSpots[targetIdx];
         int signZ = (parkingSpot.localPosition.z > 0) ? 1 : -1;
-        parkingSpot.localPosition = new Vector3(parkingSpot.localPosition.x + 3.25f, parkingSpot.localPosition.y, 8f * signZ);
+        parkingSpot.localPosition = new Vector3(parkingSpot.localPosition.x + 3.75f, parkingSpot.localPosition.y, 9f * signZ);
         parkingSpot.localRotation = Quaternion.Euler(0f, signZ > 0 ? 180f : 0f, 0f);
 
         transform.localPosition = new Vector3(2.75f, 0f, 0f);
@@ -114,41 +114,36 @@ public class MoveToGoalAgent : Agent
         float distanceToTarget = Vector3.Distance(transform.localPosition, parkingSpot.localPosition);
         float angle = Vector3.Angle(transform.forward, parkingSpot.forward);
         float distanceDelta = previousDistanceToTarget - distanceToTarget;
+        float forwardAlignment = Vector3.Dot(transform.forward.normalized, (parkingSpot.position - transform.position).normalized);
 
-        bool isClose = distanceToTarget < 2.5f;
-        bool badAngle = angle > 30f;
+        if (forwardAlignment < 0)
+            AddReward(-0.1f); // kara za jazdę tyłem
 
-        if (isOnLine && distanceDelta < 0f)
-        {
-            // Cofanie się na linii — nie karz
-        }
-        else if (distanceDelta > 0f)
-        {
-            AddReward(distanceDelta * 0.5f); // zbliża się — nagroda
-        }
-        else if (!isClose || !badAngle)
-        {
-            AddReward(distanceDelta * 0.2f); // oddala się daleko lub ma dobry kąt — kara
-        }
+        if (distanceDelta > 0f)
+            AddReward(distanceDelta * 0.5f); // postęp
+        else
+            AddReward(distanceDelta * 0.2f); // cofanie = kara
 
-        if (distanceToTarget < 2f)
-        {
-            AddReward(-angle / 180f * 0.3f); // kara za zły kąt
-        }
+        if (distanceToTarget < 2f && angle < 30f)
+            AddReward(0.2f); // zachęta za próbę zaparkowania
 
-        if (isOnLine)
-        {
-            AddReward(-0.05f); // ciągła kara za bycie na linii
-        }
+        if (distanceToTarget < 0.3f)
+            AddReward(-angle / 180f * 0.3f); // kara za zły kąt blisko celu
+
+        //if (isOnLine)
+           // AddReward(-0.01f); // łagodna kara za linię
 
         if (distanceToTarget < 1.0f && angle < 15f)
         {
-            SetReward(1.0f);
+            SetReward(3.0f); // duża nagroda za sukces
             EndEpisode();
         }
 
+        AddReward(-0.001f); // kara za czas
+
         previousDistanceToTarget = distanceToTarget;
     }
+
 
     public override void Heuristic(in ActionBuffers actionsOut)
     {
@@ -161,18 +156,18 @@ public class MoveToGoalAgent : Agent
     {
         if (other.TryGetComponent<ParkedCar>(out _))
         {
-            AddReward(-1f);
-            EndEpisode();
+            //AddReward(-1f);
+           // EndEpisode();
         }
         else if (other.TryGetComponent<Pavement>(out _))
         {
-            AddReward(-1f);
-            EndEpisode();
+            //AddReward(-1f);
+           // EndEpisode();
         }
         else if (other.TryGetComponent<Line>(out _))
         {
             isOnLine = true;
-            AddReward(-0.3f);
+            //AddReward(-0.3f);
         }
     }
 
@@ -181,7 +176,7 @@ public class MoveToGoalAgent : Agent
         if (other.TryGetComponent<Line>(out _))
         {
             isOnLine = false;
-            AddReward(0.3f); // bonus za zejście z linii
+           // AddReward(0.3f); // bonus za zejście z linii
         }
     }
 }
