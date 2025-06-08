@@ -5,15 +5,15 @@ from openvino.runtime import Core
 import matplotlib.pyplot as plt
 import matplotlib
 # --- Przygotowanie danych wejściowych ---
-# PRZED ODPALENIEM  w konsoli#
-# mo - -input_model AgentControl.onnx - -output_dir optimized_model
+# PRZED ODPALENIEM  w konsoli
+# mo - -input_model FinalAgent.onnx - -output_dir optimized_model
 
 matplotlib.use('TkAgg')
 input_obs_0 = np.random.randn(1, 10).astype(np.float32)
 input_obs_1 = np.random.randn(1, 17).astype(np.float32)
 # --- Niezoptymalizowany model (ONNX) ---
 print("Ładowanie modelu ONNX...")
-onnx_session = ort.InferenceSession("AgentControl.onnx")
+onnx_session = ort.InferenceSession("FinalAgent.onnx")
 
 onnx_input_name0 = onnx_session.get_inputs()[0].name
 onnx_input_name1 = onnx_session.get_inputs()[1].name
@@ -24,7 +24,7 @@ for input in onnx_session.get_inputs():
 
 print("Testowanie czasu inferencji dla ONNX...")
 start_time = time.time()
-for _ in range(1000000):  # Test dla 100 predykcji
+for _ in range(100000):  # Test dla 100 predykcji
     onnx_output = onnx_session.run(None,
                                    {onnx_input_name0 : input_obs_0,
                                            onnx_input_name1 : input_obs_1})
@@ -35,13 +35,13 @@ print(f"Średni czas inferencji (ONNX): {onnx_time:.6f} sek.")
 # --- Zoptymalizowany model (OpenVINO IR) ---
 print("Ładowanie modelu OpenVINO IR...")
 core = Core()
-model_ir = core.read_model("optimized_model/AgentControl.xml")
+model_ir = core.read_model("optimized_model/FinalAgent.xml")
 compiled_model_ir = core.compile_model(model_ir, "CPU")
 input_key = compiled_model_ir.input(0).get_any_name()
 
 print("Testowanie czasu inferencji dla OpenVINO IR...")
 start_time = time.time()
-for _ in range(1000000):  # Test dla 100 predykcji
+for _ in range(100000):  # Test dla 100 predykcji
     result_ir = compiled_model_ir({onnx_input_name0: input_obs_0,
                                    onnx_input_name1: input_obs_1})
 ir_time = (time.time() - start_time) / 100  # Średni czas jednej predykcji
