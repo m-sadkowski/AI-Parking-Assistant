@@ -32,13 +32,12 @@ public class MoveToGoalAgent : Agent
     private float previousDistanceToTarget;
     private Vector3 currentVelocity = Vector3.zero;
 
-    // 🔄 Dodane: informacja o byciu na linii
     private bool isOnLine = false;
-    private bool parking_try;
+    private bool parkingTry;
     public override void OnEpisodeBegin()
     {
         parkedCars = new List<Transform> { parkedCar1, parkedCar2, parkedCar3, parkedCar4, parkedCar5, parkedCar6, parkedCar7, parkedCar8 };
-        parking_try = false;
+        parkingTry = false;
         possibleParkingSpots = new List<Vector3>();
         for (int i = 0; i < 6; i++)
         {
@@ -62,13 +61,13 @@ public class MoveToGoalAgent : Agent
         parkingSpot.localPosition = new Vector3(parkingSpot.localPosition.x + 3.75f, parkingSpot.localPosition.y, 9f * signZ);
         parkingSpot.localRotation = Quaternion.Euler(0f, signZ > 0 ? 180f : 0f, 0f);
 
-        transform.localPosition = new Vector3(2.75f, 0f, 0f);
+        transform.localPosition = new Vector3(-8f, 0f, 0f);
         transform.localRotation = Quaternion.Euler(0f, 90f, 0f);
 
         rb = GetComponent<Rigidbody>();
         previousDistanceToTarget = Vector3.Distance(transform.localPosition, parkingSpot.localPosition);
 
-        isOnLine = false; // reset
+        isOnLine = false;
     }
 
     public override void CollectObservations(VectorSensor sensor)
@@ -81,7 +80,7 @@ public class MoveToGoalAgent : Agent
         sensor.AddObservation(parkingSpot.forward);
         sensor.AddObservation(toTarget.normalized);
         sensor.AddObservation(toTarget.magnitude);
-        sensor.AddObservation(currentVelocity.magnitude); // symulowana prędkość
+        sensor.AddObservation(currentVelocity.magnitude);
     }
 
     public override void OnActionReceived(ActionBuffers actions)
@@ -120,30 +119,27 @@ public class MoveToGoalAgent : Agent
             AddReward(-0.1f); // kara za jazdę tyłem
 
         if (distanceDelta > 0f)
-            AddReward(distanceDelta * 0.5f); // postęp
+            AddReward(distanceDelta * 0.5f); // nagroda za postęp
         else
-            AddReward(distanceDelta * 0.5f); // cofanie = kara
+            AddReward(distanceDelta * 0.5f); // kara za cofanie
 
-        if (distanceToTarget < 2f && angle < 30f && parking_try == false)
+        if (distanceToTarget < 2f && angle < 30f && parkingTry == false)
         {
             AddReward(0.2f); // zachęta za próbę zaparkowania
-            parking_try = true;
+            parkingTry = true;
         }
             
-
         if (distanceToTarget < 0.3f)
             AddReward(-angle / 180f * 0.3f); // kara za zły kąt blisko celu
 
-
-
         if (distanceToTarget < 1.0f && angle < 15f)
         {
-            SetReward(15.0f); // duża nagroda za sukces
-            if (isOnLine) AddReward(-5f);
+            AddReward(25.0f); // duża nagroda za sukces
+            if (isOnLine) AddReward(-5f); // pomniejszona za zostanie na linii
             EndEpisode();
         }
 
-        AddReward(-0.001f); // kara za czas
+        AddReward(-0.002f); // kara za czas
 
         previousDistanceToTarget = distanceToTarget;
     }
@@ -171,16 +167,6 @@ public class MoveToGoalAgent : Agent
         else if (other.TryGetComponent<Line>(out _))
         {
             isOnLine = true;
-            //AddReward(-0.3f);
-        }
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.TryGetComponent<Line>(out _))
-        {
-            isOnLine = false;
-           // AddReward(0.3f); // bonus za zejście z linii
         }
     }
 }
