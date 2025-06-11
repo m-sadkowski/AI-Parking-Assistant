@@ -1,6 +1,0 @@
-PODSUMOWANIE STATYSTYK TRENINGU:
-- Średnia wartość nagrody w całym treningu: 1.123
-- Mediana wartości nagród: 5.784
-- Średni czas wykonania 10,000 kroków: 14.30 sekund
-- Łączny czas treningu: 24.13 minut
-- Łączna liczba kroków: 1 000 000

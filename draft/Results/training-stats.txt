@@ -1,0 +1,6 @@
+TRAINING STATISTICS SUMMARY:
+- Average reward value throughout training: 1.123
+- Median reward value: 5.784
+- Average time per 10,000 steps: 14.30 seconds
+- Total training time: 24.13 minutes
+- Total number of steps: 1 000 000
