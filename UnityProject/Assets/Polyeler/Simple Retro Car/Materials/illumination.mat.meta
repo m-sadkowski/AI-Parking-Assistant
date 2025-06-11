@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: dcc4d1446ac4b6247b4efd43603c13f6
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 291522
+  packageName: Simple Retro Car
+  packageVersion: 1.0
+  assetPath: Assets/Polyeler/Simple Retro Car/Materials/illumination.mat
+  uploadId: 680681
